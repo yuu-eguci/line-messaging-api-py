@@ -62,10 +62,10 @@ def handle_message(event):
     # }
     # 情報の取得例。
     # event.message.text
-    # event.source.userId
+    # event.source.user_id
 
     # userId を取得。
-    user_id = event.source.userId
+    user_id = event.source.user_id
 
     # reply のテスト。
     line_bot_api.reply_message(
