@@ -39,9 +39,43 @@ def callback_post():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+
+    # 送られてくる情報の構造。
+    # {
+    #     "events": [
+    #         {
+    #             "type": "message",
+    #             "replyToken": "********************************",
+    #             "source": {
+    #                 "userId": "*********************************",
+    #                 "type": "user"
+    #             },
+    #             "timestamp": 1572247738104,
+    #             "message": {
+    #                 "type": "text",
+    #                 "id": "**************",
+    #                 "text": "げろげろん"
+    #             }
+    #         }
+    #     ],
+    #     "destination": "*********************************"
+    # }
+    # 情報の取得例。
+    # event.message.text
+    # event.source.userId
+
+    # userId を取得。
+    user_id = event.source.userId
+
+    # reply のテスト。
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text='こちらこーるばっく処理からお送りします:'+event.message.text))
+
+    # push のテスト。 userId を保存しておけば、いつでもユーザへメッセージを送れる。
+    line_bot_api.push_message(
+        user_id,
+        TextSendMessage(text='ぷっしゅめっせーじです。'))
 
 
 if __name__ == '__main__':
