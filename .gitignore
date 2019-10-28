@@ -1,0 +1,6 @@
+*~
+.DS_Store
+.vscode
+
+# これは最後に書かないとダメ。
+!.gitkeep
