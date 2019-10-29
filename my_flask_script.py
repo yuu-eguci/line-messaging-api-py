@@ -94,11 +94,11 @@ def reply_message(event):
     if event.message.text == 'とーろく':
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=f'こちらのリンクから登録してください(star)\nhttps://line-messaging-py-py-py.herokuapp.com/register?userId={event.source.user_id}'))
+            TextSendMessage(text=f'こちらのリンクから登録してください。\nhttps://line-messaging-py-py-py.herokuapp.com/register?userId={event.source.user_id}'))
     else:
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=f'そのコマンドに該当する機能が見つかりません0x100018\nメニューからタップしてご利用ください(star)'))
+            TextSendMessage(text=f'そのコマンドに該当する機能が見つかりません……。\nメニューからタップしてご利用ください。'))
 
 
 if __name__ == '__main__':
