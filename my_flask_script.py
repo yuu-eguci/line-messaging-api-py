@@ -11,8 +11,9 @@ import sys
 app = Flask(__name__)
 
 # ログを標準出力へ。heroku logs --tail で確認するため。
+# app.logger.info で出力するため、レベルは INFO にする。
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
-# app.logger.setLevel(logging.DEBUG)
+app.logger.setLevel(logging.INFO)
 
 # Get from environment variables.
 CHANNEL_ACCESS_TOKEN = os.environ['CHANNEL_ACCESS_TOKEN']
