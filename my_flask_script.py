@@ -38,6 +38,14 @@ def top_page():
     return 'Here is root page.'
 
 
+@app.route('/register', methods=['GET'])
+def registration_page():
+    profile = line_bot_api.get_profile(request.args.get('userId'))
+    line_bot_api.push_message(
+        USER_ID,
+        TextSendMessage(text=f'{profile.display_name} さまを登録しました!\nご利用ありがとうございます!'))
+
+
 # ユーザがメッセージを送信したとき、この URL へアクセスが行われます。
 @app.route('/callback', methods=['POST'])
 def callback_post():
@@ -86,11 +94,11 @@ def reply_message(event):
     if event.message.text == 'とーろく':
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=f'こちらのリンクから登録してください(star)\nhttps://line-messaging-py-py-py.herokuapp.com/register'))
+            TextSendMessage(text=f'こちらのリンクから登録してください(star)\nhttps://line-messaging-py-py-py.herokuapp.com/register?userId={event.source.user_id}'))
     else:
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=f'そのコマンドに該当する機能が見つかりません(tear)\nメニューからタップしてご利用ください(star)'))
+            TextSendMessage(text=f'そのコマンドに該当する機能が見つかりません0x100018\nメニューからタップしてご利用ください(star)'))
 
 
 if __name__ == '__main__':
