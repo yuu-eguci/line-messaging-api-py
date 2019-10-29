@@ -83,10 +83,14 @@ def reply_message(event):
     # event.message.text
     # event.source.user_id
 
-    # reply のテスト。
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=f'こちらこーるばっく処理からお送りします:こうおっしゃいましたね?「{event.message.text}」'))
+    if event.message.text == 'とーろく':
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=f'こちらのリンクから登録してください(star)\nhttps://line-messaging-py-py-py.herokuapp.com/register'))
+    else:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=f'そのコマンドに該当する機能が見つかりません(tear)\nメニューからタップしてご利用ください(star)'))
 
 
 if __name__ == '__main__':
