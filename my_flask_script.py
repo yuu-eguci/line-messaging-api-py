@@ -81,9 +81,6 @@ def reply_message(event):
     # event.message.text
     # event.source.user_id
 
-    # push_message で使用したいので userId をログに出しておく。
-    app.logger.info('userId:' + event.source.user_id)
-
     # reply のテスト。
     line_bot_api.reply_message(
         event.reply_token,
