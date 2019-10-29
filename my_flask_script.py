@@ -1,10 +1,18 @@
 from flask import Flask, request, abort
-import os
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
+# 環境変数取得のため。
+import os
+# ログを出力するため。
+import logging
+import sys
 
 app = Flask(__name__)
+
+# ログを標準出力へ。heroku logs --tail で確認するため。
+app.logger.addHandler(logging.StreamHandler(sys.stdout))
+app.logger.setLevel(logging.INFO)
 
 # Get from environment variables.
 CHANNEL_ACCESS_TOKEN = os.environ['CHANNEL_ACCESS_TOKEN']
