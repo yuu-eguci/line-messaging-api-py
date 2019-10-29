@@ -15,7 +15,7 @@ app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.INFO)
 
-# Get from environment variables.
+# 大事な情報は環境変数から取得。
 CHANNEL_ACCESS_TOKEN = os.environ['CHANNEL_ACCESS_TOKEN']
 CHANNEL_SECRET = os.environ['CHANNEL_SECRET']
 
@@ -47,8 +47,7 @@ def callback_post():
 
 
 @handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-
+def reply_message(event):
     # 送られてくる情報の構造。
     # {
     #     "events": [
@@ -73,18 +72,13 @@ def handle_message(event):
     # event.message.text
     # event.source.user_id
 
-    # userId を取得。
-    user_id = event.source.user_id
+    # push_message で使用したいので userId をログに出しておく。
+    app.logger.info('userId:' + event.source.user_id)
 
     # reply のテスト。
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text='こちらこーるばっく処理からお送りします:'+event.message.text))
-
-    # push のテスト。 userId を保存しておけば、いつでもユーザへメッセージを送れる。
-    line_bot_api.push_message(
-        user_id,
-        TextSendMessage(text='ぷっしゅめっせーじです。'))
 
 
 if __name__ == '__main__':
