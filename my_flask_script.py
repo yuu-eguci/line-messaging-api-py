@@ -84,7 +84,7 @@ def reply_message(event):
     # reply のテスト。
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text='こちらこーるばっく処理からお送りします:'+event.message.text))
+        TextSendMessage(text=f'こちらこーるばっく処理からお送りします:こうおっしゃいましたね?「{event.message.text}」'))
 
 
 if __name__ == '__main__':
