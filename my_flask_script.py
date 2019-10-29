@@ -42,8 +42,9 @@ def top_page():
 def registration_page():
     profile = line_bot_api.get_profile(request.args.get('userId'))
     line_bot_api.push_message(
-        USER_ID,
+        profile.user_id,
         TextSendMessage(text=f'{profile.display_name} さまを登録しました!\nご利用ありがとうございます!'))
+    return 'Please return to LINE app.'
 
 
 # ユーザがメッセージを送信したとき、この URL へアクセスが行われます。
