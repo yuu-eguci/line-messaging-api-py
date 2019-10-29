@@ -32,11 +32,13 @@ line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(CHANNEL_SECRET)
 
 
+# 必須ではないけれど、サーバに上がったとき確認するためにトップページを追加しておきます。
 @app.route('/')
 def top_page():
     return 'Here is root page.'
 
 
+# ユーザがメッセージを送信したとき、この URL へアクセスが行われます。
 @app.route('/callback', methods=['POST'])
 def callback_post():
     # get X-Line-Signature header value
