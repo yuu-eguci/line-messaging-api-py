@@ -13,7 +13,11 @@ from linebot.v3.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, FollowEvent
+    TextMessage, TextSendMessage
+)
+from linebot.v3.webhooks import (
+    MessageEvent,
+    FollowEvent,
 )
 
 # 環境変数取得のため。
