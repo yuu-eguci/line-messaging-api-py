@@ -1,3 +1,9 @@
+"""
+NOTE: この flask app は v3 に未対応。
+      このへん↓を参考に修正したほうがいいよ! やるならね!
+      https://github.com/line/line-bot-sdk-python/blob/master/examples/flask-echo/app_with_handler.py
+"""
+
 from flask import Flask, request, abort
 
 from linebot import (
