@@ -98,6 +98,9 @@ def reply_message(event):
     # event.message.text
     # event.source.user_id
 
+    app.logger.info(f'event type: {event.type}')
+    app.logger.info(f'user_id: {event.source.user_id}')
+
     if event.message.text == 'とーろく':
         msg = (
             'こちらのリンクから登録してください。\n'
