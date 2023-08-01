@@ -1,6 +1,6 @@
 """
-NOTE: この flask app は v3 に未対応。
-      このへん↓を参考に修正したほうがいいよ! やるならね!
+line-bot-sdk v3 にちゃんと対応してるよ!
+NOTE: このへん↓が参考になるよ!
       https://github.com/line/line-bot-sdk-python/blob/master/examples/flask-echo/app_with_handler.py
 """
 
@@ -118,7 +118,7 @@ def callback_post():
 # event.type が 'follow' のとき、この関数が呼び出されます。
 @handler.add(FollowEvent)
 def handle_follow(event):
-    app.logger.info("Got Follow event:" + event.source.user_id)
+    app.logger.info("Got Follow event from:" + event.source.user_id)
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message(
@@ -132,6 +132,7 @@ def handle_follow(event):
 # event.type が 'message' のとき、この関数が呼び出されます。
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
+    app.logger.info("Got Message event from:" + event.source.user_id)
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         if event.message.text == 'とーろく':
