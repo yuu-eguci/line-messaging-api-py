@@ -15,6 +15,7 @@ from linebot.v3.exceptions import (
 from linebot.v3.webhooks import (
     MessageEvent,
     FollowEvent,
+    TextMessageContent,
 )
 from linebot.v3.messaging import (
     Configuration,
@@ -129,7 +130,7 @@ def handle_follow(event):
 
 
 # event.type が 'message' のとき、この関数が呼び出されます。
-@handler.add(MessageEvent, message=TextMessage)
+@handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
