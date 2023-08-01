@@ -72,8 +72,8 @@ def callback_post():
     return 'OK'
 
 
-@handler.add(FollowEvent, message=TextMessage)
-def follow_message(event):
+@handler.add(FollowEvent)
+def handle_follow(event):
     app.logger.info(f'user_id: {event.source.user_id}')
     line_bot_api.reply_message(
         event.reply_token,
