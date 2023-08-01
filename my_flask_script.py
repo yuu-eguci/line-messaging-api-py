@@ -25,11 +25,8 @@ app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.INFO)
 
 # 大事な情報は環境変数から取得。
-CHANNEL_ACCESS_TOKEN = os.environ['CHANNEL_ACCESS_TOKEN']
-CHANNEL_SECRET = os.environ['CHANNEL_SECRET']
-
-line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
-handler = WebhookHandler(CHANNEL_SECRET)
+line_bot_api = LineBotApi(os.environ['LINE_CHANNEL_ACCESS_TOKEN'])
+handler = WebhookHandler(os.environ['LINE_CHANNEL_SECRET'])
 
 
 # 必須ではないけれど、サーバに上がったとき確認するためにトップページを追加しておきます。
@@ -93,13 +90,16 @@ def reply_message(event):
     # event.source.user_id
 
     if event.message.text == 'とーろく':
+        msg = (
+            'こちらのリンクから登録してください。\n'
+            f'https://line-messaging-py-py-py.herokuapp.com/register?userId={event.source.user_id}')
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=f'こちらのリンクから登録してください。\nhttps://line-messaging-py-py-py.herokuapp.com/register?userId={event.source.user_id}'))
+            TextSendMessage(text=msg))
     else:
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=f'そのコマンドに該当する機能が見つかりません……。\nメニューからタップしてご利用ください。'))
+            TextSendMessage(text='そのコマンドに該当する機能が見つかりません……。\nメニューからタップしてご利用ください。'))
 
 
 if __name__ == '__main__':
