@@ -6,15 +6,25 @@ NOTE: この flask app は v3 に未対応。
 
 from flask import Flask, request, abort
 
-from linebot import (
-    LineBotApi, WebhookHandler
+from linebot.v3 import (
+    WebhookHandler
 )
-from linebot.exceptions import (
+from linebot.v3.exceptions import (
     InvalidSignatureError
 )
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, FollowEvent
+from linebot.v3.webhooks import (
+    MessageEvent,
+    FollowEvent,
 )
+from linebot.v3.messaging import (
+    Configuration,
+    ApiClient,
+    MessagingApi,
+    ReplyMessageRequest,
+    PushMessageRequest,
+    TextMessage,
+)
+
 
 # 環境変数取得のため。
 import os
@@ -31,8 +41,10 @@ app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.INFO)
 
 # 大事な情報は環境変数から取得。
-line_bot_api = LineBotApi(os.environ['LINE_CHANNEL_ACCESS_TOKEN'])
 handler = WebhookHandler(os.environ['LINE_CHANNEL_SECRET'])
+configuration = Configuration(
+    access_token=os.environ['LINE_CHANNEL_ACCESS_TOKEN']
+)
 
 
 # 必須ではないけれど、サーバに上がったとき確認するためにトップページを追加しておきます。
@@ -44,16 +56,20 @@ def top_page():
 
 @app.route('/register', methods=['GET'])
 def registration_page():
-    profile = line_bot_api.get_profile(request.args.get('userId'))
-    app.logger.info(f'profile: {profile}')
-    app.logger.info(f'user_id: {profile.user_id}')
-    line_bot_api.push_message(
-        profile.user_id,
-        TextSendMessage(text=f'{profile.display_name} さまを登録しました!\nご利用ありがとうございます!'))
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        profile = line_bot_api.get_profile(request.args.get('userId'))
+        line_bot_api.push_message(
+            PushMessageRequest(
+                to=profile.user_id,
+                messages=[TextMessage(text=f'{profile.display_name} さまを登録しました!\nご利用ありがとうございます!')]
+            )
+        )
+
     return 'Please return to LINE app.'
 
 
-# ユーザがメッセージを送信したとき、この URL へアクセスが行われます。
+# なにかイベントが発生したとき、この URL へアクセスが行われます。
 @app.route('/callback', methods=['POST'])
 def callback_post():
     # get X-Line-Signature header value
@@ -65,6 +81,7 @@ def callback_post():
 
     # handle webhook body
     try:
+        # @handler.add した関数が呼び出されます。
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
@@ -72,51 +89,65 @@ def callback_post():
     return 'OK'
 
 
-@handler.add(FollowEvent, message=TextMessage)
-def follow_message(event):
-    app.logger.info(f'user_id: {event.source.user_id}')
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=f'あなたの ID は {event.source.user_id} ですね!'))
+# 各 handler の関数の引数 event には、以下のような情報が入っています。
+# {
+#     "events": [
+#         {
+#             "type": "message",
+#             "replyToken": "********************************",
+#             "source": {
+#                 "userId": "*********************************",
+#                 "type": "user"
+#             },
+#             "timestamp": 1572247738104,
+#             "message": {
+#                 "type": "text",
+#                 "id": "**************",
+#                 "text": "げろげろん"
+#             }
+#         }
+#     ],
+#     "destination": "*********************************"
+# }
+# 情報の取得例。
+# event.message.text
+# event.source.user_id
 
 
+# event.type が 'follow' のとき、この関数が呼び出されます。
+@handler.add(FollowEvent)
+def handle_follow(event):
+    app.logger.info("Got Follow event:" + event.source.user_id)
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        line_bot_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=f'あなたの ID は {event.source.user_id} ですね!')]
+            )
+        )
+
+
+# event.type が 'message' のとき、この関数が呼び出されます。
 @handler.add(MessageEvent, message=TextMessage)
-def reply_message(event):
-    # 送られてくる情報の構造。
-    # {
-    #     "events": [
-    #         {
-    #             "type": "message",
-    #             "replyToken": "********************************",
-    #             "source": {
-    #                 "userId": "*********************************",
-    #                 "type": "user"
-    #             },
-    #             "timestamp": 1572247738104,
-    #             "message": {
-    #                 "type": "text",
-    #                 "id": "**************",
-    #                 "text": "げろげろん"
-    #             }
-    #         }
-    #     ],
-    #     "destination": "*********************************"
-    # }
-    # 情報の取得例。
-    # event.message.text
-    # event.source.user_id
-
-    if event.message.text == 'とーろく':
-        msg = (
-            'こちらのリンクから登録してください。\n'
-            f'https://line-messaging-py-py-py.herokuapp.com/register?userId={event.source.user_id}')
+def handle_message(event):
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        if event.message.text == 'とーろく':
+            msg = (
+                'こちらのリンクから登録してください。\n'
+                f'https://line-messaging-py-py-py.herokuapp.com/register?userId={event.source.user_id}')
+        else:
+            msg = (
+                'そのコマンドに該当する機能が見つかりません……。\n'
+                'メニューからタップしてご利用ください。'
+            )
         line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=msg))
-    else:
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text='そのコマンドに該当する機能が見つかりません……。\nメニューからタップしてご利用ください。'))
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=msg)]
+            )
+        )
 
 
 if __name__ == '__main__':

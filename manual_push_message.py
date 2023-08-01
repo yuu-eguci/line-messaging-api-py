@@ -1,3 +1,7 @@
+"""
+line-bot-sdk v3 にちゃんと対応してるよ!
+"""
+
 import os
 from linebot.v3.messaging import (
     Configuration,
