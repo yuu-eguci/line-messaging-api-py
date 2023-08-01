@@ -13,7 +13,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
+    MessageEvent, TextMessage, TextSendMessage, FollowEvent
 )
 
 # 環境変数取得のため。
@@ -72,6 +72,14 @@ def callback_post():
     return 'OK'
 
 
+@handler.add(FollowEvent, message=TextMessage)
+def follow_message(event):
+    app.logger.info(f'user_id: {event.source.user_id}')
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=f'あなたの ID は {event.source.user_id} ですね!'))
+
+
 @handler.add(MessageEvent, message=TextMessage)
 def reply_message(event):
     # 送られてくる情報の構造。
@@ -97,9 +105,6 @@ def reply_message(event):
     # 情報の取得例。
     # event.message.text
     # event.source.user_id
-
-    app.logger.info(f'event type: {event.type}')
-    app.logger.info(f'user_id: {event.source.user_id}')
 
     if event.message.text == 'とーろく':
         msg = (
