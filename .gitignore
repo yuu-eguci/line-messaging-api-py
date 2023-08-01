@@ -1,6 +1,7 @@
 *~
 .DS_Store
 .vscode
+.env
 
 # これは最後に書かないとダメ。
 !.gitkeep

@@ -32,12 +32,15 @@ handler = WebhookHandler(os.environ['LINE_CHANNEL_SECRET'])
 # 必須ではないけれど、サーバに上がったとき確認するためにトップページを追加しておきます。
 @app.route('/')
 def top_page():
+    app.logger.info('message: root page')
     return 'Here is root page.'
 
 
 @app.route('/register', methods=['GET'])
 def registration_page():
     profile = line_bot_api.get_profile(request.args.get('userId'))
+    app.logger.info(f'profile: {profile}')
+    app.logger.info(f'user_id: {profile.user_id}')
     line_bot_api.push_message(
         profile.user_id,
         TextSendMessage(text=f'{profile.display_name} さまを登録しました!\nご利用ありがとうございます!'))
