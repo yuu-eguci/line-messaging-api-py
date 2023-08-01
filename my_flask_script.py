@@ -32,6 +32,7 @@ handler = WebhookHandler(os.environ['LINE_CHANNEL_SECRET'])
 # 必須ではないけれど、サーバに上がったとき確認するためにトップページを追加しておきます。
 @app.route('/')
 def top_page():
+    app.logger.info('message: root page')
     return 'Here is root page.'
 
 
