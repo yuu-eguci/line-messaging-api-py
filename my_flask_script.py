@@ -1,6 +1,6 @@
 """
-NOTE: この flask app は v3 に未対応。
-      このへん↓を参考に修正したほうがいいよ! やるならね!
+line-bot-sdk v3 にちゃんと対応してるよ!
+NOTE: このへん↓が参考になるよ!
       https://github.com/line/line-bot-sdk-python/blob/master/examples/flask-echo/app_with_handler.py
 """
 
