@@ -93,13 +93,16 @@ def reply_message(event):
     # event.source.user_id
 
     if event.message.text == 'とーろく':
+        msg = (
+            'こちらのリンクから登録してください。\n'
+            f'https://line-messaging-py-py-py.herokuapp.com/register?userId={event.source.user_id}')
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=f'こちらのリンクから登録してください。\nhttps://line-messaging-py-py-py.herokuapp.com/register?userId={event.source.user_id}'))
+            TextSendMessage(text=msg))
     else:
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=f'そのコマンドに該当する機能が見つかりません……。\nメニューからタップしてご利用ください。'))
+            TextSendMessage(text='そのコマンドに該当する機能が見つかりません……。\nメニューからタップしてご利用ください。'))
 
 
 if __name__ == '__main__':
