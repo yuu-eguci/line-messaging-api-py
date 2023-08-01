@@ -25,11 +25,8 @@ app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.INFO)
 
 # 大事な情報は環境変数から取得。
-CHANNEL_ACCESS_TOKEN = os.environ['CHANNEL_ACCESS_TOKEN']
-CHANNEL_SECRET = os.environ['CHANNEL_SECRET']
-
-line_bot_api = LineBotApi(CHANNEL_ACCESS_TOKEN)
-handler = WebhookHandler(CHANNEL_SECRET)
+line_bot_api = LineBotApi(os.environ['LINE_CHANNEL_ACCESS_TOKEN'])
+handler = WebhookHandler(os.environ['LINE_CHANNEL_SECRET'])
 
 
 # 必須ではないけれど、サーバに上がったとき確認するためにトップページを追加しておきます。
