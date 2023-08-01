@@ -53,7 +53,7 @@ def registration_page():
     return 'Please return to LINE app.'
 
 
-# ユーザがメッセージを送信したとき、この URL へアクセスが行われます。
+# なにかイベントが発生したとき、この URL へアクセスが行われます。
 @app.route('/callback', methods=['POST'])
 def callback_post():
     # get X-Line-Signature header value
@@ -65,6 +65,7 @@ def callback_post():
 
     # handle webhook body
     try:
+        # @handler.add した関数が呼び出されます。
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
@@ -72,6 +73,32 @@ def callback_post():
     return 'OK'
 
 
+# 各 handler の関数の引数 event には、以下のような情報が入っています。
+# {
+#     "events": [
+#         {
+#             "type": "message",
+#             "replyToken": "********************************",
+#             "source": {
+#                 "userId": "*********************************",
+#                 "type": "user"
+#             },
+#             "timestamp": 1572247738104,
+#             "message": {
+#                 "type": "text",
+#                 "id": "**************",
+#                 "text": "げろげろん"
+#             }
+#         }
+#     ],
+#     "destination": "*********************************"
+# }
+# 情報の取得例。
+# event.message.text
+# event.source.user_id
+
+
+# event.type が 'follow' のとき、この関数が呼び出されます。
 @handler.add(FollowEvent)
 def handle_follow(event):
     app.logger.info(f'user_id: {event.source.user_id}')
@@ -80,32 +107,9 @@ def handle_follow(event):
         TextSendMessage(text=f'あなたの ID は {event.source.user_id} ですね!'))
 
 
+# event.type が 'message' のとき、この関数が呼び出されます。
 @handler.add(MessageEvent, message=TextMessage)
-def reply_message(event):
-    # 送られてくる情報の構造。
-    # {
-    #     "events": [
-    #         {
-    #             "type": "message",
-    #             "replyToken": "********************************",
-    #             "source": {
-    #                 "userId": "*********************************",
-    #                 "type": "user"
-    #             },
-    #             "timestamp": 1572247738104,
-    #             "message": {
-    #                 "type": "text",
-    #                 "id": "**************",
-    #                 "text": "げろげろん"
-    #             }
-    #         }
-    #     ],
-    #     "destination": "*********************************"
-    # }
-    # 情報の取得例。
-    # event.message.text
-    # event.source.user_id
-
+def handle_message(event):
     if event.message.text == 'とーろく':
         msg = (
             'こちらのリンクから登録してください。\n'
