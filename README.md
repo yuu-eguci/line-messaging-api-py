@@ -1,7 +1,7 @@
 line-messaging-api-py
 ===
 
-The repository that consists of code related to LINE Messaging API.
+🌲 Python 3.10 + LINE Messaging API + Azure App Service
 
 ![](media/media.png)
 
