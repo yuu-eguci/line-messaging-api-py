@@ -5,9 +5,10 @@
 name: Build and deploy Python app to Azure Web App - line-messaging-api-apple
 
 on:
-  push:
-    branches:
-      - main
+  # NOTE: 遊び終わったので無効化しています。
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 jobs:
