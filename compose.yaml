@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      target: app
+    env_file:
+      - path: .env
+        required: false
+    ports:
+      - "8000:8000"
+
+  dev:
+    build:
+      context: .
+      target: dev
