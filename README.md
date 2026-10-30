@@ -1,40 +1,69 @@
 line-messaging-api-py
 ===
 
-🌲 Python 3.10 + LINE Messaging API + Azure App Service
+🌲 Python + Flask + LINE Messaging API (line-bot-sdk v3) で作った LINE Bot のサンプルです。
 
 ![](media/media.png)
+
+## 概要
+
+- Docker: 対応しています (`Dockerfile`, `compose.yaml`)
+- Python: 3.14
+- Linter: Ruff
+- テスト: pytest
+- 主要ライブラリ: line-bot-sdk 3.27.0, Flask 3.1.3, gunicorn 26.2.0
+- 依存管理: Pipenv (`Pipfile.lock`)
+- CI: GitHub Actions で lint とテストを実行します
+
+## クイックスタート
+
+リポジトリ直下に `.env` を作り、LINE の認証情報を書きます。 `.env` は Git 管理外です。
+
+```
+LINE_CHANNEL_SECRET=...
+LINE_CHANNEL_ACCESS_TOKEN=...
+```
+
+アプリを起動します。
+
+```bash
+docker compose up --build app
+```
+
+http://localhost:8000/ で確認できます。 LINE の Webhook URL には `https://<公開ホスト>/callback` を設定します。
+
+## lint とテスト
+
+```bash
+docker compose run --rm --build dev ruff check .
+docker compose run --rm --build dev pytest
+```
+
+テストはダミーの認証情報とモックを使います。 LINE へ実際にメッセージを送ることはありません。
+
+## エンドポイント
+
+- `GET /`: 動作確認用のトップページです。
+- `POST /callback`: LINE からの Webhook を受け取ります。 `X-Line-Signature` で署名を検証します。
+- `GET /register?userId=...`: 登録完了のメッセージをプッシュ送信します。
+
+`manual_push_message.py` は環境変数 `USER_ID` のユーザへメッセージを手動でプッシュ送信するスクリプトです。
 
 ## 自分のサーバと LINE 公式アカウントと個人の LINE の関係を示した図
 
 ![](media/line-official-account-system.png)
 
-## このリポジトリを動かすまでの手順
+## LINE 公式アカウントの準備
 
-LINE 公式アカウントを作る。
+- LINE Developers (https://developers.line.biz/) へログインします。
+    - 個人の LINE アカウントでも使えますが、実運用ではビジネスアカウントを想定しています。
+- プロバイダ (アプリを提供する組織) を作ります。
+- Messaging API チャネルを作ります (LINE に表示させたい名前をつけます)。
+- Basic settings > Channel secret の値を `LINE_CHANNEL_SECRET` に設定します。
+- Messaging API > Channel access token の値を `LINE_CHANNEL_ACCESS_TOKEN` に設定します。
+- アプリをデプロイして動作確認したら、 Messaging API > Webhook settings に Webhook URL を設定します。
 
-- LINE Developers へ行く↓
-    - https://developers.line.biz/
-- ビジネスアカウントでログインする
-    - 別に個人の LINE アカウントでもいいんだけど、実際に使いそうなのはこっちじゃね?
-- プロバイダを作る (アプリを提供する組織のこと)
-- チャネル (LINE に表示させたい名前をつければいい)
-    - Create a Messaging API channel
-- Basic settings > Channel secret からシークレットを取得
-    - LINE_CHANNEL_SECRET: ...
-- Messaging API > Channel access token からトークンを取得
-    - LINE_CHANNEL_ACCESS_TOKEN: ...
+## デプロイについて
 
-本リポジトリの flask アプリをデプロイする。
-
-- 以前は Heroku へアップしてたけれど、 Heroku 改悪により廃止。
-- いまは App Service へアップしている。
-    - App Service のときは App Service logs > ON にしとくこと。
-
-かんたんに動作確認したら、 Webhook URL を設定する。
-
-- Messaging API > Webhook settings
-
-## line-bot-sdk v3 対応済み
-
-:)
+- 以前は Heroku、その後 Azure App Service へデプロイしていました。
+- Azure App Service 向けの workflow (`.github/workflows/dev_line-messaging-api-apple.yml`) は手動実行のみで、現在は使っていません。

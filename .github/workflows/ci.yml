@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Build dev image
+        run: docker build --target dev -t line-messaging-api-py-dev .
+
+      - name: Lint
+        run: docker run --rm line-messaging-api-py-dev ruff check .
+
+      - name: Test
+        run: docker run --rm line-messaging-api-py-dev pytest
