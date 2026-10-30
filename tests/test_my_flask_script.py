@@ -2,6 +2,7 @@ import base64
 import hashlib
 import hmac
 import json
+import logging
 from unittest import mock
 
 import pytest
@@ -28,7 +29,7 @@ def webhook_body(event):
         'deliveryContext': {'isRedelivery': False},
         **event,
     }
-    return json.dumps({'destination': 'Udummy', 'events': [event]})
+    return json.dumps({'destination': 'Udummy', 'events': [event]}, ensure_ascii=False)
 
 
 def text_message_body(text):
@@ -89,7 +90,17 @@ def test_callback_replies_registration_link(client, line_bot_api):
     response = post_callback(client, body, sign(body))
 
     assert response.status_code == 200
-    assert f'/register?userId={USER_ID}' in replied_text(line_bot_api)
+    assert f'https://localhost/register?userId={USER_ID}' in replied_text(line_bot_api)
+
+
+def test_callback_does_not_log_request_body(client, line_bot_api, caplog):
+    body = text_message_body('ひみつのメッセージ')
+
+    with caplog.at_level(logging.INFO, logger=my_flask_script.app.logger.name):
+        response = post_callback(client, body, sign(body))
+
+    assert response.status_code == 200
+    assert 'ひみつのメッセージ' not in caplog.text
 
 
 def test_callback_replies_user_id_on_follow(client, line_bot_api):
@@ -111,3 +122,11 @@ def test_register_pushes_message(client, line_bot_api):
     request = line_bot_api.push_message.call_args.args[0]
     assert request.to == USER_ID
     assert request.messages[0].text.startswith('テスト さまを登録しました!')
+
+
+def test_register_rejects_missing_user_id(client, line_bot_api):
+    response = client.get('/register')
+
+    assert response.status_code == 400
+    line_bot_api.get_profile.assert_not_called()
+    line_bot_api.push_message.assert_not_called()

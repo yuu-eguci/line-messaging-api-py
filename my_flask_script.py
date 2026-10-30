@@ -4,7 +4,7 @@ NOTE: このへん↓が参考になるよ!
       https://github.com/line/line-bot-sdk-python/blob/master/examples/flask-echo/app_with_handler.py
 """
 
-from flask import Flask, request, abort
+from flask import Flask, request, abort, url_for
 
 from linebot.v3 import (
     WebhookHandler
@@ -36,7 +36,7 @@ import sys
 
 app = Flask(__name__)
 
-# ログを標準出力へ。heroku logs --tail で確認するため。
+# ログを標準出力へ。
 # app.logger.info で出力するため、レベルは INFO にする。
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.INFO)
@@ -57,9 +57,13 @@ def top_page():
 
 @app.route('/register', methods=['GET'])
 def registration_page():
+    user_id = request.args.get('userId')
+    if not user_id:
+        abort(400)
+
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
-        profile = line_bot_api.get_profile(request.args.get('userId'))
+        profile = line_bot_api.get_profile(user_id)
         line_bot_api.push_message(
             PushMessageRequest(
                 to=profile.user_id,
@@ -77,8 +81,8 @@ def callback_post():
     signature = request.headers['X-Line-Signature']
 
     # get request body as text
+    # NOTE: 本文にはユーザのメッセージが入っているため、ログには出しません。
     body = request.get_data(as_text=True)
-    app.logger.info('Request body: ' + body)
 
     # handle webhook body
     try:
@@ -136,9 +140,8 @@ def handle_message(event):
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         if event.message.text == 'とーろく':
-            msg = (
-                'こちらのリンクから登録してください。\n'
-                f'https://line-messaging-py-py-py.herokuapp.com/register?userId={event.source.user_id}')
+            register_url = url_for('registration_page', userId=event.source.user_id, _external=True, _scheme='https')
+            msg = f'こちらのリンクから登録してください。\n{register_url}'
         else:
             msg = (
                 'そのコマンドに該当する機能が見つかりません……。\n'
