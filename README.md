@@ -44,8 +44,10 @@ docker compose run --rm --build dev pytest
 ## エンドポイント
 
 - `GET /`: 動作確認用のトップページです。
-- `POST /callback`: LINE からの Webhook を受け取ります。 `X-Line-Signature` で署名を検証します。
-- `GET /register?userId=...`: 登録完了のメッセージをプッシュ送信します。
+- `POST /callback`: LINE からの Webhook を受け取ります。 `X-Line-Signature` で署名を検証し、不正な署名には 400 を返します。プライバシーのため、 Webhook の本文はログに出しません。
+- `GET /register?userId=...`: 登録完了のメッセージをプッシュ送信します。 `userId` がない場合は 400 を返します。
+
+Bot に「とーろく」と送ると、 `/register` へのリンクを返信します。リンクのホストは Webhook を受けたホストで、スキームは https です。
 
 `manual_push_message.py` は環境変数 `USER_ID` のユーザへメッセージを手動でプッシュ送信するスクリプトです。
 
