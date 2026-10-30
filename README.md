@@ -49,7 +49,11 @@ docker compose run --rm --build dev pytest
 
 Bot に「とーろく」と送ると、 `/register` へのリンクを返信します。リンクのホストは Webhook を受けたホストで、スキームは https です。
 
-`manual_push_message.py` は環境変数 `USER_ID` のユーザへメッセージを手動でプッシュ送信するスクリプトです。
+`manual_push_message.py` は環境変数 `USER_ID` のユーザへメッセージを手動でプッシュ送信するスクリプトです。送信に失敗した場合は終了コード 1 で終了します。
+
+```bash
+docker compose run --rm --build -e USER_ID=... app python manual_push_message.py
+```
 
 ## 自分のサーバと LINE 公式アカウントと個人の LINE の関係を示した図
 
