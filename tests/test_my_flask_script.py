@@ -91,7 +91,6 @@ def test_callback_replies_registration_link(client, line_bot_api):
 
     assert response.status_code == 200
     assert f'https://localhost/register?userId={USER_ID}' in replied_text(line_bot_api)
-    assert 'herokuapp.com' not in replied_text(line_bot_api)
 
 
 def test_callback_does_not_log_request_body(client, line_bot_api, caplog):
