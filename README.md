@@ -72,4 +72,5 @@ docker compose run --rm --build -e USER_ID=... app python manual_push_message.py
 ## デプロイについて
 
 - 以前は Heroku、その後 Azure App Service へデプロイしていました。
-- Azure App Service 向けの workflow (`.github/workflows/dev_line-messaging-api-apple.yml`) は手動実行のみで、現在は使っていません。
+- 現在、デプロイ用の workflow はありません。 GitHub Actions は lint とテストだけを実行します。
+- `Dockerfile` の `app` ステージは、ポート 8000 で gunicorn を起動します。デプロイ先でもこのイメージを使えます。
